@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  TabsView.swift
 //  CombineWebsockets
 //
 //  Created by Jacob Bartlett on 17/04/2025.
@@ -7,18 +7,27 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct TabsView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            AuctionView()
+                .tabItem {
+                    Label("Auction", systemImage: "dollarsign.circle")
+                }
+            
+            ThermostatView()
+                .tabItem {
+                    Label("Thermostat", systemImage: "dial.min")
+                }
+            
+            GameView()
+                .tabItem {
+                    Label("Game", systemImage: "gamecontroller")
+                }
         }
-        .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    TabsView()
 }
