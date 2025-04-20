@@ -1,18 +1,41 @@
+//
+//  WebSocketService.swift
+//  CombineWebsockets
+//
+//  Created by Jacob Bartlett on 17/04/2025.
+//
+
 import Foundation
 import Combine
 
 final class WebSocketService {
+    private static var instances: [String: WebSocketService] = [:]
+//    private static let lock = NSLock()
+    
     private var webSocketTask: URLSessionWebSocketTask?
     private let dataSubject = PassthroughSubject<Data, Error>()
-    
+
     var publisher: AnyPublisher<Data, Error> {
         dataSubject.eraseToAnyPublisher()
     }
+
+    static func getOrCreateInstance(endpoint: String) -> WebSocketService {
+//        lock.lock()
+//        defer { lock.unlock() }
+
+        if let existing = instances[endpoint] {
+            return existing
+        }
+
+        let newInstance = WebSocketService(endpoint: endpoint)
+        instances[endpoint] = newInstance
+        return newInstance
+    }
     
-    init(endpoint: String) {
+    private init(endpoint: String) {
         // Run `ipconfig getifaddr en0` to get IP address of the local server
         // Simulators or paired iPhones don't share localhost with your Mac
-        let url = URL(string: "ws://192.168.0.16:8000")?.appendingPathComponent(endpoint)
+        let url = URL(string: "ws://192.168.0.7:8000")?.appendingPathComponent(endpoint)
         setupWebSocket(url: url!)
     }
     

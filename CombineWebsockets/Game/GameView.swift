@@ -13,5 +13,10 @@ struct GameView: View {
 //                .position(x: character.position.x, y: character.position.y)
 //        }
         Text("Game")
+        
+        // TODO: Unit test using Just()
+        // TODO: removeDuplicates for existing states
+        // TODO: Filter here
+
     }
 } 

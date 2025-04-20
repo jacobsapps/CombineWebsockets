@@ -10,12 +10,12 @@ import Combine
 import Foundation
 
 struct AuctionView: View {
-    @State private var webSocketService = WebSocketService(endpoint: "auction")
-    @State private var currentBid: AuctionBid?
+    let webSocketService = WebSocketService.getOrCreateInstance(endpoint: "auction")
+    @State private var highestBid: AuctionBid?
     @State private var timeRemaining: Int = 120
     @State private var timer: Timer.TimerPublisher = Timer.publish(every: 1, on: .main, in: .common)
     @State private var cancellables = Set<AnyCancellable>()
-    @State private var decoder = JSONDecoder()
+    private let decoder = JSONDecoder()
     
     var formattedTimeRemaining: String {
         let minutes = timeRemaining / 60
@@ -36,14 +36,14 @@ struct AuctionView: View {
                 .frame(height: 300)
                 .padding()
             
-            if let bid = currentBid {
+            if let bid = highestBid {
                 VStack(spacing: 12) {
                     Text("Current Bid: $\(bid.amount, specifier: "%.2f")")
                         .font(.title)
                     
                     Text("\(timeRemaining > 0 ? "Bidder" : "Winner"): \(bid.bidder)")
                         .font(.headline)
-                        .foregroundStyle(timeRemaining > 0 ? .primary : .green)
+                        .foregroundStyle(timeRemaining > 0 ? Color.primary : Color.green)
                     
                     Text("Last Updated: \(bid.timestamp, style: .relative)")
                         .font(.caption)
@@ -62,13 +62,25 @@ struct AuctionView: View {
             }.store(in: &cancellables)
             
             webSocketService.publisher
+                .compactMap { data -> AuctionBid? in
+                    try? decoder.decode(AuctionBid.self, from: data)
+                }
+                .buffer(size: 1, prefetch: .keepFull, whenFull: .dropOldest)
+//                .scan([]) { (history: [AuctionBid], newBid) in
+//                    history + [newBid]
+//                }
+                .scan(nil) { (highestBidSoFar: AuctionBid?, newBid: AuctionBid) -> AuctionBid? in
+                    guard let highestBid = highestBidSoFar else {
+                        return newBid
+                    }
+                    return newBid.amount > highestBid.amount ? newBid : highestBid
+                }
+                .compactMap { $0 }
                 .receive(on: RunLoop.main)
-                .decode(type: AuctionBid.self, decoder: decoder)
-                .sink(receiveCompletion: {
-                    print($0)
-                }, receiveValue: { bid in
+                .sink(receiveCompletion: { print($0) },
+                      receiveValue: { bid in
                     withAnimation {
-                        currentBid = bid
+                        highestBid = bid
                         timeRemaining = bid.timeRemaining
                     }
                 })
