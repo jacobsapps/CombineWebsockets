@@ -15,7 +15,7 @@ async def thermostat_websocket(websocket: WebSocket):
         while True:
             current_time = datetime.now()
             # Generate temperature between 10-40°C with smooth transitions
-            temperature = 25 + (math.sin(current_time.timestamp() / 10) * 15)
+            temperature = 25 + (math.sin(2 * current_time.timestamp() / 10) * 15)
             angle = (temperature - 10) * (180/30)  # Map 10-40°C to 0-180 degrees
             
             thermostat_message = {

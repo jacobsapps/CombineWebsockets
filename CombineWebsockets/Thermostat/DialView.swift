@@ -30,7 +30,11 @@ struct DialView: View {
             if let state = currentState {
                 ForEach(0..<180) { degree in
                     Rectangle()
-                        .fill(isMarkerActive(degree: Double(degree), currentAngle: state.angle) ? color(for: currentState?.temperature ?? 0) : Color.gray.opacity(0.3))
+                        .fill(
+                            isMarkerActive(degree: Double(degree), currentAngle: state.angle)
+                            ? color(for: tempForDegree(Double(degree)))
+                            : Color.gray.opacity(0.3)
+                        )
                         .frame(width: degree % 15 == 0 ? 3 : 1, height: 8)
                         .offset(y: -140)
                         .rotationEffect(.degrees(Double(degree)))
@@ -105,6 +109,13 @@ struct DialView: View {
                 })
                 .store(in: &cancellables)
         }
+    }
+    
+    private func tempForDegree(_ degree: Double) -> Double {
+        let degreesInDial = 180.0
+        let tempRange = maxTemp - minTemp
+        let normalized = degree / degreesInDial
+        return minTemp + (normalized * tempRange)
     }
         
     private func color(for temp: Double) -> Color {

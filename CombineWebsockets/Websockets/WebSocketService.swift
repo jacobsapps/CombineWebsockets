@@ -10,7 +10,7 @@ import Combine
 
 final class WebSocketService {
     private static var instances: [String: WebSocketService] = [:]
-//    private static let lock = NSLock()
+    private static let lock = NSLock()
     
     private var webSocketTask: URLSessionWebSocketTask?
     private let dataSubject = PassthroughSubject<Data, Error>()
@@ -20,8 +20,8 @@ final class WebSocketService {
     }
 
     static func getOrCreateInstance(endpoint: String) -> WebSocketService {
-//        lock.lock()
-//        defer { lock.unlock() }
+        lock.lock()
+        defer { lock.unlock() }
 
         if let existing = instances[endpoint] {
             return existing
@@ -35,7 +35,7 @@ final class WebSocketService {
     private init(endpoint: String) {
         // Run `ipconfig getifaddr en0` to get IP address of the local server
         // Simulators or paired iPhones don't share localhost with your Mac
-        let url = URL(string: "ws://192.168.0.7:8000")?.appendingPathComponent(endpoint)
+        let url = URL(string: "ws://192.168.0.86:8000")?.appendingPathComponent(endpoint)
         setupWebSocket(url: url!)
     }
     

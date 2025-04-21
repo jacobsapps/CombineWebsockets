@@ -15,15 +15,15 @@ struct TabsView: View {
 //                    Label("Auction", systemImage: "dollarsign.circle")
 //                }
 //            
-            DialView()
-                .tabItem {
-                    Label("Thermostat", systemImage: "dial.min")
-                }
-//            
-//            GameView()
+//            DialView()
 //                .tabItem {
-//                    Label("Game", systemImage: "gamecontroller")
+//                    Label("Thermostat", systemImage: "dial.min")
 //                }
+//            
+            GameView()
+                .tabItem {
+                    Label("Game", systemImage: "gamecontroller")
+                }
         }
     }
 }
