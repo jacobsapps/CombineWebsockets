@@ -11,8 +11,9 @@ WORLD_WIDTH = 1000
 WORLD_HEIGHT = 1000
 
 class Character:
-    def __init__(self, name, x, y):
+    def __init__(self, name, emoji, x, y):
         self.name = name
+        self.emoji = emoji 
         self.x = x
         self.y = y
         self.target_x = x
@@ -42,16 +43,17 @@ class Character:
     def get_position(self):
         return {
             "name": self.name,
+            "emoji": self.emoji,
             "x": round(self.x, 2),
             "y": round(self.y, 2)
         }
 
 # Initialize characters
 characters = [
-    Character("Warrior", random.uniform(0, WORLD_WIDTH), random.uniform(0, WORLD_HEIGHT)),
-    Character("Mage", random.uniform(0, WORLD_WIDTH), random.uniform(0, WORLD_HEIGHT)),
-    Character("Rogue", random.uniform(0, WORLD_WIDTH), random.uniform(0, WORLD_HEIGHT)),
-    Character("Archer", random.uniform(0, WORLD_WIDTH), random.uniform(0, WORLD_HEIGHT))
+    Character("Warrior", "⚔", random.uniform(0, WORLD_WIDTH), random.uniform(0, WORLD_HEIGHT)),
+    Character("Mage", "🧙‍♂️", random.uniform(0, WORLD_WIDTH), random.uniform(0, WORLD_HEIGHT)),
+    Character("Rogue", "🦹‍♀️", random.uniform(0, WORLD_WIDTH), random.uniform(0, WORLD_HEIGHT)),
+    Character("Archer", "🏹", random.uniform(0, WORLD_WIDTH), random.uniform(0, WORLD_HEIGHT))
 ]
 
 @game_router.websocket("/game")
@@ -82,7 +84,7 @@ async def game_websocket(websocket: WebSocket):
             }
             
             await websocket.send_json(position_update)
-            await asyncio.sleep(0.1)  # Update 10 times per second
+            await asyncio.sleep(0.01666)  # Update 60 times per second
             
         # Send end message
         await websocket.send_json({

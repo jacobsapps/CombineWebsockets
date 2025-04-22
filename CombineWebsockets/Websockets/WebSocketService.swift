@@ -35,7 +35,7 @@ final class WebSocketService {
     private init(endpoint: String) {
         // Run `ipconfig getifaddr en0` to get IP address of the local server
         // Simulators or paired iPhones don't share localhost with your Mac
-        let url = URL(string: "ws://192.168.0.86:8000")?.appendingPathComponent(endpoint)
+        let url = URL(string: "ws://10.101.2.199:8000")?.appendingPathComponent(endpoint)
         setupWebSocket(url: url!)
     }
     
