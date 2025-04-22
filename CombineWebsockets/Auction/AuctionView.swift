@@ -10,7 +10,7 @@ import Combine
 import Foundation
 
 struct AuctionView: View {
-    let webSocketService = WebSocketService.getOrCreateInstance(endpoint: "auction")
+    let webSocketService = WebSocketServiceImpl.getOrCreateInstance(endpoint: "auction")
     @State private var highestBid: AuctionBid?
     @State private var timeRemaining: Int = 120
     @State private var timer: Timer.TimerPublisher = Timer.publish(every: 1, on: .main, in: .common)
@@ -24,32 +24,34 @@ struct AuctionView: View {
     }
     
     var body: some View {
-        VStack {
-            Text(formattedTimeRemaining)
-                .font(.system(.title, design: .monospaced))
-                .foregroundColor(timeRemaining < 30 ? .red : .primary)
-                .padding()
-            
+        HStack {
             Image("monalisa")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(height: 300)
                 .padding()
             
-            if let bid = highestBid {
-                VStack(spacing: 12) {
-                    Text("Current Bid: $\(bid.amount, specifier: "%.2f")")
-                        .font(.title)
-                    
-                    Text("\(timeRemaining > 0 ? "Bidder" : "Winner"): \(bid.bidder)")
-                        .font(.headline)
-                        .foregroundStyle(timeRemaining > 0 ? Color.primary : Color.green)
-                    
-                    Text("Last Updated: \(bid.timestamp, style: .relative)")
-                        .font(.caption)
+            VStack {
+                Text(formattedTimeRemaining)
+                    .font(.system(.title, design: .monospaced))
+                    .foregroundColor(timeRemaining < 30 ? .red : .primary)
+                    .padding()
+                
+                if let bid = highestBid {
+                    VStack(spacing: 12) {
+                        Text("Current Bid: $\(bid.amount, specifier: "%.2f")")
+                            .font(.title)
+                        
+                        Text("\(timeRemaining > 0 ? "Bidder" : "Winner"): \(bid.bidder)")
+                            .font(.headline)
+                            .foregroundStyle(timeRemaining > 0 ? Color.primary : Color.green)
+                        
+                        Text("Last Updated: \(bid.timestamp, style: .relative)")
+                            .font(.caption)
+                    }
+                    .padding()
+                    .transition(.scale.combined(with: .opacity))
                 }
-                .padding()
-                .transition(.scale.combined(with: .opacity))
             }
         }
         .onAppear {
@@ -66,9 +68,9 @@ struct AuctionView: View {
                     try? decoder.decode(AuctionBid.self, from: data)
                 }
                 .buffer(size: 1, prefetch: .keepFull, whenFull: .dropOldest)
-//                .scan([]) { (history: [AuctionBid], newBid) in
-//                    history + [newBid]
-//                }
+            //                .scan([]) { (history: [AuctionBid], newBid) in
+            //                    history + [newBid]
+            //                }
                 .scan(nil) { (highestBidSoFar: AuctionBid?, newBid: AuctionBid) -> AuctionBid? in
                     guard let highestBid = highestBidSoFar else {
                         return newBid

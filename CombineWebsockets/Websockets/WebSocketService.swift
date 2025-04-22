@@ -8,7 +8,11 @@
 import Foundation
 import Combine
 
-final class WebSocketService {
+protocol WebSocketService {
+    var publisher: AnyPublisher<Data, Error> { get }
+}
+
+final class WebSocketServiceImpl: WebSocketService {
     private static var instances: [String: WebSocketService] = [:]
     private static let lock = NSLock()
     
@@ -27,7 +31,7 @@ final class WebSocketService {
             return existing
         }
 
-        let newInstance = WebSocketService(endpoint: endpoint)
+        let newInstance = WebSocketServiceImpl(endpoint: endpoint)
         instances[endpoint] = newInstance
         return newInstance
     }
@@ -35,7 +39,7 @@ final class WebSocketService {
     private init(endpoint: String) {
         // Run `ipconfig getifaddr en0` to get IP address of the local server
         // Simulators or paired iPhones don't share localhost with your Mac
-        let url = URL(string: "ws://10.101.2.199:8000")?.appendingPathComponent(endpoint)
+        let url = URL(string: "ws://192.168.0.16:8000")?.appendingPathComponent(endpoint)
         setupWebSocket(url: url!)
     }
     

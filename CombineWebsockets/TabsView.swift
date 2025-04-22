@@ -10,16 +10,16 @@ import SwiftUI
 struct TabsView: View {
     var body: some View {
         TabView {
-//            AuctionView()
-//                .tabItem {
-//                    Label("Auction", systemImage: "dollarsign.circle")
-//                }
-//            
-//            DialView()
-//                .tabItem {
-//                    Label("Thermostat", systemImage: "dial.min")
-//                }
-//            
+            AuctionView()
+                .tabItem {
+                    Label("Auction", systemImage: "dollarsign.circle")
+                }
+            
+            DialView()
+                .tabItem {
+                    Label("Thermostat", systemImage: "dial.min")
+                }
+
             GameView()
                 .tabItem {
                     Label("Game", systemImage: "gamecontroller")

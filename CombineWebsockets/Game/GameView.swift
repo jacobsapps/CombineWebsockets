@@ -9,10 +9,14 @@ import SwiftUI
 import Combine
 
 struct GameView: View {
-    let webSocketService = WebSocketService.getOrCreateInstance(endpoint: "game")
+    let webSocketService: WebSocketService
     @State private var currentGame: GameState?
     @State private var cancellables = Set<AnyCancellable>()
     private let decoder = JSONDecoder()
+    
+    init(webSocketService: WebSocketService = WebSocketServiceImpl.getOrCreateInstance(endpoint: "game")) {
+        self.webSocketService = webSocketService
+    }
     
     var body: some View {
         Canvas { context, size in
@@ -55,5 +59,26 @@ struct GameView: View {
     
     private func normalize(_ value: Double, in max: CGFloat) -> CGFloat {
         CGFloat(value / 1000) * max
+    }
+}
+
+#Preview {
+    GameView(webSocketService: MockWebsocketService(characters: [
+        .init(name: "Mage", emoji: "🧙‍♂️", x: 100, y: 200),
+        .init(name: "Warrior", emoji: "⚔", x: 400, y: 300),
+        .init(name: "Rogue", emoji: "🧝‍♀️", x: 200, y: 100),
+        .init(name: "Archer", emoji: "🏹", x: 500, y: 400)
+    ]))
+}
+
+struct MockWebsocketService: WebSocketService {
+    let publisher: AnyPublisher<Data, Error>
+    
+    init(characters: [GameState.GameCharacter]) {
+        let state = GameState(characters: characters)
+        let data = try! JSONEncoder().encode(state)
+        self.publisher = Just(data)
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
     }
 }
