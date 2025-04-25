@@ -71,6 +71,7 @@ struct AuctionView: View {
             }.store(in: &cancellables)
             
             webSocketService.publisher
+                .buffer(size: 1, prefetch: .keepFull, whenFull: .dropOldest)
                 .compactMap { data -> AuctionBid? in
                     try? decoder.decode(AuctionBid.self, from: data)
                 }

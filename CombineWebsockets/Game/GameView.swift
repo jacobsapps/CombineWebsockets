@@ -49,7 +49,7 @@ struct GameView: View {
             webSocketService.publisher
                 .decode(type: GameState.self, decoder: decoder)
                 .receive(on: RunLoop.main)
-                .removeDuplicates(by: { $0 == $1 })
+                .removeDuplicates()
                 .filter { !$0.characters.isEmpty }
                 .sink(
                     receiveCompletion: { print($0) },
