@@ -12,6 +12,7 @@ struct GameView: View {
     let webSocketService: WebSocketService
     @State private var currentGame: GameState?
     @State private var cancellables = Set<AnyCancellable>()
+    @State private var hasStarted = false
     private let decoder = JSONDecoder()
     
     init(webSocketService: WebSocketService = WebSocketServiceImpl.getOrCreateInstance(endpoint: "game")) {
@@ -42,6 +43,9 @@ struct GameView: View {
         )
         .ignoresSafeArea()
         .onAppear {
+            guard !hasStarted else { return }
+            hasStarted = true
+            
             webSocketService.publisher
                 .decode(type: GameState.self, decoder: decoder)
                 .receive(on: RunLoop.main)

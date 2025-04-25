@@ -7,11 +7,13 @@
 
 import Foundation
 
-struct AuctionBid: Codable {
+struct AuctionBid: Codable, Identifiable {
     let bidder: String
     let amount: Double
     let timestamp: Date
     let timeRemaining: Int
+    
+    let id: String = UUID().uuidString
     
     var formattedTimeRemaining: String {
         let minutes = timeRemaining / 60

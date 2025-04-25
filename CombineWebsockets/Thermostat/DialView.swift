@@ -113,25 +113,28 @@ struct DialView: View {
                 })
                 .store(in: &cancellables)
         }
-}
-
-private func tempForDegree(_ degree: Double) -> Double {
-    let degreesInDial = 180.0
-    let tempRange = maxTemp - minTemp
-    let normalized = degree / degreesInDial
-    return minTemp + (normalized * tempRange)
-}
-
-private func color(for temp: Double) -> Color {
-    switch temp {
-    case ...15: return .blue
-    case ...25: return .yellow
-    case ...35: return .orange
-    default: return .red
+        .onDisappear {
+            cancellables.removeAll()
+        }
     }
-}
-
-private func isMarkerActive(degree: Double, currentAngle: Double) -> Bool {
-    degree <= currentAngle
-}
+    
+    private func tempForDegree(_ degree: Double) -> Double {
+        let degreesInDial = 180.0
+        let tempRange = maxTemp - minTemp
+        let normalized = degree / degreesInDial
+        return minTemp + (normalized * tempRange)
+    }
+    
+    private func color(for temp: Double) -> Color {
+        switch temp {
+        case ...15: return .blue
+        case ...25: return .yellow
+        case ...35: return .orange
+        default: return .red
+        }
+    }
+    
+    private func isMarkerActive(degree: Double, currentAngle: Double) -> Bool {
+        degree <= currentAngle
+    }
 }

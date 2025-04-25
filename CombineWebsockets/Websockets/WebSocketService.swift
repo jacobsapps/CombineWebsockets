@@ -39,7 +39,7 @@ final class WebSocketServiceImpl: WebSocketService {
     private init(endpoint: String) {
         // Run `ipconfig getifaddr en0` to get IP address of the local server
         // Simulators or paired iPhones don't share localhost with your Mac
-        let url = URL(string: "ws://192.168.0.16:8000")?.appendingPathComponent(endpoint)
+        let url = URL(string: "ws://192.168.0.83:8000")?.appendingPathComponent(endpoint)
         setupWebSocket(url: url!)
     }
     
@@ -47,31 +47,32 @@ final class WebSocketServiceImpl: WebSocketService {
         let session = URLSession(configuration: .default)
         webSocketTask = session.webSocketTask(with: url)
         webSocketTask?.resume()
-        receiveNextMessage()
-    }
-    
-    private func receiveNextMessage() {
-        webSocketTask?.receive { [weak self] result in
-            
-            defer { self?.receiveNextMessage() }
-            
-            guard let self = self else { return }
-            switch result {
-            case .success(let message):
-                switch message {
-                case .string(let string):
-                    dataSubject.send(string.data(using: .utf8) ?? Data())
-                case .data(let data):
-                    dataSubject.send(data)
-                @unknown default:
-                    break
-                }
-                
-            case .failure(let error):
-                dataSubject.send(completion: .failure(error))
+        
+        Task {
+            while true {
+                try await receiveNextMessage()
             }
         }
     }
+
+private func receiveNextMessage() async throws {
+    guard let webSocketTask else { return }
+    
+    do {
+        let message = try await webSocketTask.receive()
+        switch message {
+        case .string(let string):
+            dataSubject.send(string.data(using: .utf8) ?? Data())
+        case .data(let data):
+            dataSubject.send(data)
+        @unknown default:
+            break
+        }
+    } catch {
+        dataSubject.send(completion: .failure(error))
+        throw error
+    }
+}
     
     func disconnect() {
         webSocketTask?.cancel(with: .goingAway, reason: nil)
@@ -80,4 +81,4 @@ final class WebSocketServiceImpl: WebSocketService {
     deinit {
         disconnect()
     }
-} 
+}
